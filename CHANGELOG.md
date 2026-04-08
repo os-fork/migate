@@ -13,3 +13,7 @@
 ### Version 1.0.3:
 
 - Minor improvements
+
+### Version 1.0.4:
+
+- Minor improvements
