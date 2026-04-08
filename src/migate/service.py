@@ -8,6 +8,9 @@ from migate.config import (
 )
 
 def get_service(cookies, sid):
+
+    deviceId = cookies['deviceId']
+
     response = requests.get(SERVICELOGIN_URL, params={'_json': "true", 'sid': sid}, cookies=cookies, headers=HEADERS)
 
     response_text = json.loads(response.text[11:])
@@ -34,6 +37,7 @@ def get_service(cookies, sid):
         'ssecurity': ssecurity,
         'cUserId': cUserId,
         'psecurity': psecurity,
+        'deviceId': deviceId
     }
 
     service = {'servicedata': servicedata}
