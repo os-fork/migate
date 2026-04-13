@@ -1,47 +1,57 @@
-import requests, json, urllib.parse, os, base64, hashlib
+import json
+import base64
+import hashlib
+from urllib.parse import quote
 
-from urllib.parse import parse_qs, urlparse, quote
+from migate.config import SERVICELOGIN_URL, console
+from migate.requester import session, get
 
-from migate.config import (
-    HEADERS,
-    SERVICELOGIN_URL
-)
 
-def get_service(cookies, sid):
+def get_service(auth_cookies, params):
+    params["_json"] = True
 
-    deviceId = cookies['deviceId']
+    deviceId = auth_cookies["deviceId"]
 
-    response = requests.get(SERVICELOGIN_URL, params={'_json': "true", 'sid': sid}, cookies=cookies, headers=HEADERS)
+    for k, v in auth_cookies.items():
+        session.cookies.set(k, v)
 
-    response_text = json.loads(response.text[11:])
+    try:
+        response      = get(SERVICELOGIN_URL, params=params)
+        response_text = json.loads(response.text[11:])
+    except Exception as e:
+        console.print(f"\n[red]Connection error: {e}[/]\n")
+        raise SystemExit(1)
 
-    nonce = response_text.get('nonce')
-    ssecurity = response_text.get('ssecurity')
-    location = response_text.get('location')
-    cUserId = response_text.get('cUserId')
-    psecurity = response_text.get('psecurity')
+    nonce     = response_text.get("nonce")
+    ssecurity = response_text.get("ssecurity")
+    location  = response_text.get("location")
+    cUserId   = response_text.get("cUserId")
+    psecurity = response_text.get("psecurity")
 
-    sign_text = f"nonce={nonce}&{ssecurity}"
-    sha1_digest = hashlib.sha1(sign_text.encode()).digest()
-    base64_sign = base64.b64encode(sha1_digest)
-    client_sign = quote(base64_sign)
+    if not nonce or not ssecurity:
+        console.print(f"\n[red]Missing service data | Response: {response_text}[/]\n")
+        raise SystemExit(1)
 
-    url = location + f"&clientSign={client_sign}"
-    
-    response = requests.get(url, headers=HEADERS, cookies=cookies)
+    client_sign = quote(base64.b64encode(
+        hashlib.sha1(f"nonce={nonce}&{ssecurity}".encode()).digest()
+    ))
 
-    cookies = response.cookies.get_dict()
+    try:
+        response        = get(f"{location}&clientSign={client_sign}")
+        service_cookies = response.cookies.get_dict()
+    except Exception as e:
+        console.print(f"\n[red]Connection error: {e}[/]\n")
+        raise SystemExit(1)
 
-    servicedata = {
-        'nonce': nonce,
-        'ssecurity': ssecurity,
-        'cUserId': cUserId,
-        'psecurity': psecurity,
-        'deviceId': deviceId
+    session.cookies.clear()
+
+    return {
+        "servicedata": {
+            "nonce":     nonce,
+            "ssecurity": ssecurity,
+            "cUserId":   cUserId,
+            "psecurity": psecurity,
+            "deviceId":  deviceId,
+        },
+        "cookies": service_cookies,
     }
-
-    service = {'servicedata': servicedata}
-
-    service['cookies'] = cookies
-
-    return service

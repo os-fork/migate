@@ -33,7 +33,7 @@ pass_token = migate.get_passtoken(service_param)
 
 # ___
 
-service = migate.get_service(pass_token, service_id)
+service = migate.get_service(pass_token, service_param)
 # service returns: {'servicedata': {'nonce', 'ssecurity', 'cUserId', 'psecurity'}, 'cookies': {'serviceToken/popRunToken/new_bbs_serviceToken' ...}}
 
 ```

@@ -1,70 +1,98 @@
 import os
-import time
-import webbrowser
-import requests
 import json
+import time
+import base64
+import platform
+import threading
+import webbrowser
 import http.server
 import socketserver
-import threading
+from dataclasses import dataclass
 from pathlib import Path
-import platform
-from migate.config import HEADERS, BASE_URL, console
+from typing import Optional
+from urllib.parse import unquote, urlparse, parse_qs
 
-class QuietHandler(http.server.SimpleHTTPRequestHandler):
-    def log_message(self, format, *args):
-        pass
+from migate.config import BASE_URL, console
+from migate.requester import get, post
 
-def start_temp_server(directory):
-    handler = lambda *args: QuietHandler(*args, directory=directory)
-    httpd = socketserver.TCPServer(("127.0.0.1", 0), handler)
-    port = httpd.server_address[1]
-    thread = threading.Thread(target=httpd.serve_forever, daemon=True)
-    thread.start()
-    return httpd, port
+_TEMPLATE = (Path(__file__).parent / "captcha.html").read_text()
 
-def handle_captcha(send_url, response, cookies, payload, capt_key):
+
+@dataclass
+class _CaptchaState:
+    b64:   str
+    error: bool          = False
+    code:  Optional[str] = None
+    done:  bool          = False
+
+
+def _build_html(b64: str, error: bool = False) -> str:
+    msg = "<p class='error'>Incorrect code! Try again.</p>" if error else ""
+    return _TEMPLATE.replace("{{B64}}", b64).replace("{{MSG}}", msg)
+
+
+def handle_captcha(send_url, response, payload, capt_key):
     try:
         response_text = json.loads(response.text[11:])
-        cap_url = BASE_URL + response_text["captchaUrl"]
-        response = requests.get(cap_url, headers=HEADERS)
-        cookies.update(response.cookies.get_dict())
-        
-        captcha_filename = f"{int(time.time())}_captcha.jpg"
-        captcha_dir = Path.home()
-        captcha_path = captcha_dir / captcha_filename
+        cap_url       = BASE_URL + response_text["captchaUrl"]
+        state         = _CaptchaState(b64=base64.b64encode(get(cap_url).content).decode())
 
-        with open(captcha_path, "wb") as f:
-            f.write(response.content)
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def log_message(self, *a): pass
 
-        httpd, port = start_temp_server(str(captcha_dir))
-        local_url = f"http://127.0.0.1:{port}/{captcha_filename}"
-        
-        console.print("Opening browser to view CAPTCHA...", style="white")
-        
-        if platform.system() == "Linux":
-            os.system(f"xdg-open '{local_url}'")
+            def do_GET(self):
+                if self.path == "/":
+                    body = _build_html(state.b64, state.error).encode()
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/html; charset=utf-8")
+                    self.send_header("Content-Length", str(len(body)))
+                    self.end_headers()
+                    self.wfile.write(body)
+
+                elif self.path.startswith("/submit"):
+                    code        = parse_qs(urlparse(self.path).query).get("code", [""])[0]
+                    state.code  = unquote(code).strip()
+                    start       = time.time()
+                    while state.code is not None and time.time() - start < 10:
+                        time.sleep(0.1)
+                    result = b"ok" if state.done else b"retry"
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/plain")
+                    self.end_headers()
+                    self.wfile.write(result)
+
+        httpd  = socketserver.TCPServer(("127.0.0.1", 0), Handler)
+        port   = httpd.server_address[1]
+        thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+        thread.start()
+
+        url = f"http://127.0.0.1:{port}"
+        if platform.system() in ("Linux", "Android"):
+            os.system(f"xdg-open '{url}' 2>/dev/null")
         else:
-            webbrowser.open(local_url)
+            webbrowser.open(url)
+        console.print(f"[white]Captcha opened at: [/][orange]{url}[/]")
 
-        console.print(f"[white]Check browser at: [/][orange]{local_url}[/]")
-        user_input = console.input("[orange]Enter Captcha code from image: [/]")
-        
-        payload[capt_key] = user_input
+        while True:
+            while state.code is None:
+                time.sleep(0.2)
+
+            payload[capt_key] = state.code
+
+            resp      = post(send_url, data=payload)
+            resp_text = json.loads(resp.text[11:])
+
+            if resp_text.get("code") == 87001:
+                state.b64   = base64.b64encode(get(cap_url).content).decode()
+                state.error = True
+                state.code  = None
+            else:
+                state.done = True
+                state.code = None
+                break
 
         httpd.shutdown()
-        httpd.server_close()
+        return resp
 
-        response = requests.post(send_url, headers=HEADERS, data=payload, cookies=cookies)
-        
-        if os.path.exists(captcha_path):
-            os.remove(captcha_path)
-
-        response_text = json.loads(response.text[11:])
-
-        if response_text.get("code") == 87001:
-            console.print("\nIncorrect captcha code! Trying again...\n", style="red")
-            return handle_captcha(send_url, response, cookies, payload, capt_key)
-
-        return response
     except Exception as e:
         return {"error": f"Captcha handling failed: {str(e)}"}
