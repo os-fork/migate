@@ -17,3 +17,7 @@
 ### Version 1.0.4:
 
 - Minor improvements
+
+### Version 1.0.5:
+
+- Fixes and improvements
