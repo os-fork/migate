@@ -2,11 +2,11 @@
 
 **migate** is a simplified Xiaomi authentication gateway for Python projects
 
-```
 
 ## Usage
 
 ```python
+
 import migate
 
 service_id = ''
