@@ -2,18 +2,6 @@
 
 **migate** is a simplified Xiaomi authentication gateway for Python projects
 
-## Installation
-```bash
-pip install migate
-```
-
-Or in pyproject.toml:
-
-```toml
-dependencies = [
-    "migate"
-]
-
 ```
 
 ## Usage
@@ -23,18 +11,13 @@ import migate
 
 service_id = ''
 
-service_param = {"sid": service_id}
+param = {"sid": service_id}
 
-# Required for some service IDs like "unlockApi"
-# service_param["checkSafeAddress"] = True
+# Required for some service IDs like "unlockApi" :
+# param["checkSafeAddress"] = True
 
-pass_token = migate.get_passtoken(service_param)
-# pass_token returns: {"deviceId", "passToken", "userId"}
-
-# ___
-
-service = migate.get_service(pass_token, service_param)
-# service returns: {'servicedata': {'nonce', 'ssecurity', 'cUserId', 'psecurity'}, 'cookies': {'serviceToken/popRunToken/new_bbs_serviceToken' ...}}
+passToken = migate.get_passtoken(param)
+service = migate.get_service(passToken, param)
 
 ```
 
