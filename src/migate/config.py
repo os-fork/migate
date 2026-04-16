@@ -10,6 +10,8 @@ SEND_PH_TICKET        = BASE_URL + "/identity/auth/sendPhoneTicket"
 VERIFY_EM             = BASE_URL + "/identity/auth/verifyEmail"
 VERIFY_PH             = BASE_URL + "/identity/auth/verifyPhone"
 USERQUOTA_URL         = BASE_URL + "/identity/pass/sms/userQuota"
+REGION_URL = BASE_URL + "/pass/user/login/region"
+REGIONCONFIG_URL = BASE_URL + "/pass2/config"
 
 c_theme = Theme({
     "orange": "bold #ff6900",

@@ -29,3 +29,7 @@
 ### Version 1.0.7:
 
 - add get ( region & regionConfig )
+
+### Version 1.0.8:
+
+- minor fixes
