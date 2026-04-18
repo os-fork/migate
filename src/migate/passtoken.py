@@ -18,10 +18,11 @@ def _get_device_id(user: str) -> str:
     id_file.write_text(json.dumps({"deviceId": deviceId}))
     return deviceId
 
+def get_passtoken(auth_data=None):
+    if auth_data is None:
+        auth_data = {"sid": "passport"}
 
-def get_passtoken(auth_data):
-
-    sid          = auth_data["sid"]
+    sid = auth_data["sid"]
     cookies_file = Path.home() / f".{sid}" / "cookies.json"
 
     if cookies_file.exists():
@@ -34,12 +35,7 @@ def get_passtoken(auth_data):
             passToken = None
 
         if passToken is not None:
-            choice = console.input(
-                f"[green]Already logged in[/]\n"
-                f"[white]Account ID: [/][orange]{passToken['userId']}[/]\n\n"
-                f"[white]Press 'Enter' to continue[/]\n"
-                f"[white](To log out, type [red]2[/] and press Enter.): "
-            ).strip().lower()
+            choice = console.input(f"\n[green]Already logged in[/][white]\nAccount ID: [/][orange]{passToken['userId']}[/]\n\n[white](Enter to continue, [red]2[/red] To log out)[/white][white] > [/white]").strip().lower()
 
             if choice == "2":
                 cookies_file.unlink()

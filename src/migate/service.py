@@ -7,7 +7,10 @@ from migate.config import SERVICELOGIN_URL, console
 from migate.requester import session, get
 
 
-def get_service(auth_cookies, params):
+def get_service(auth_cookies, params=None):
+    if params is None:
+        params = {"sid": "passport"}
+
     params["_json"] = True
 
     deviceId = auth_cookies["deviceId"]
