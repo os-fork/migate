@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/migate-%23FF6900?style=flat&logo=xiaomi&logoColor=white" alt="migate" width="100"/>
 </a>
 
-**Xiaomi authentication gateway for Python..**
+**Xiaomi authentication gateway for Python**
 
 ---
 
