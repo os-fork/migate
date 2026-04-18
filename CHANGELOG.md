@@ -36,4 +36,5 @@
 
 ### Version 1.0.9:
 
+- Minor improvements
 - add defaults param ( sid="passport" )
