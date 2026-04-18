@@ -1,7 +1,7 @@
 <div align="center">
 
 <a href="https://github.com/offici5l/migate/releases/latest">
-  <img src="https://img.shields.io/badge/migate-%23FF6900?style=flat&logo=xiaomi&logoColor=white" alt="migate" width="200"/>
+  <img src="https://img.shields.io/badge/migate-%23FF6900?style=flat&logo=xiaomi&logoColor=white" alt="migate" width="100"/>
 </a>
 
 **Xiaomi authentication gateway for Python..**
@@ -28,22 +28,22 @@ pip install migate
 import migate
 # default param = { 'sid': 'passport'}
 pass_token = migate.get_passtoken()
-service    = migate.get_service(pass_token)
+service = migate.get_service(pass_token)
 ```
 
 To use a custom param ex:
 
 ```python
-param      = {"sid": "unlockApi", "checkSafeAddress": True}
+param = {"sid": "unlockApi", "checkSafeAddress": True}
 pass_token = migate.get_passtoken(param)
-service    = migate.get_service(pass_token, param)
+service = migate.get_service(pass_token, param)
 ```
 
 To get the account region:
 
 ```python
 account_region = migate.get_region(pass_token)
-region_cfg     = migate.get_regionConfig(account_region)
+region_cfg = migate.get_regionConfig(account_region)
 ```
 ---
 
