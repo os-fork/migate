@@ -38,3 +38,7 @@
 
 - Minor improvements
 - add defaults param ( sid="passport" )
+
+### Version 1.1.0:
+
+- Add QR code and Url login methods

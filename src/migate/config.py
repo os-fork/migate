@@ -12,6 +12,7 @@ VERIFY_PH             = BASE_URL + "/identity/auth/verifyPhone"
 USERQUOTA_URL         = BASE_URL + "/identity/pass/sms/userQuota"
 REGION_URL = BASE_URL + "/pass/user/login/region"
 REGIONCONFIG_URL = BASE_URL + "/pass2/config"
+LONGPOLLING_URL = BASE_URL + "/longPolling/loginUrl"
 
 c_theme = Theme({
     "orange": "bold #ff6900",

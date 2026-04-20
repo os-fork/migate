@@ -23,21 +23,25 @@ def post(url, **kwargs):
     return _request("POST", url, **kwargs)
 
 
-def _request(method, url, **kwargs):
+def _request(method, url, retries=RETRIES, **kwargs):
     kwargs.setdefault("timeout", TIMEOUT)
     last_error = None
 
-    for attempt in range(RETRIES):
+    for attempt in range(retries):
         try:
             loader.start()
             response = session.request(method, url, **kwargs)
             response.raise_for_status()
             return response
+        except requests.exceptions.Timeout:
+            if retries == 1:
+                return None
+            last_error = e
         except Exception as e:
             last_error = e
-            if attempt < RETRIES - 1:
+            if attempt < retries - 1:
                 time.sleep(BACKOFF ** (attempt + 1))
         finally:
-            loader.stop() 
+            loader.stop()
 
-    raise ConnectionError(f"Failed after {RETRIES} attempts: {last_error}")
+    raise ConnectionError(f"Failed after {retries} attempts: {last_error}")

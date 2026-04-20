@@ -30,7 +30,6 @@ def get_regionConfig(region):
         console.print(f"\n[red]Connection error: {e}[/]\n")
         raise SystemExit(1)
 
-        
     region_config_dict = response_text.get("regionConfig", {})
 
     if not region_config_dict:
