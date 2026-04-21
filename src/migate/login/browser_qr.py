@@ -24,9 +24,9 @@ def handle_browser_qr(auth_data: dict, choice: str) -> dict:
 
         timeout = response_text["timeout"]
 
-        if choice == "2":
+        if choice == "1":
             url = response_text["loginUrl"]
-            delay = 7
+            delay = 5
         elif choice == "3":
             url = response_text["qr"]
             qrTips = response_text["qrTips"]
