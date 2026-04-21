@@ -10,8 +10,9 @@ from migate.requester import get
 
 def handle_browser_qr(auth_data: dict, choice: str) -> dict:
 
+    auth_data["_json"] = False
     auth_data["_hasLogo"] = True
-    #  auth_data["_qrsize"] = 720 # captcha size ex
+    # auth_data["_qrsize"] = 720 # captcha size ex
 
     while True:
         try:
