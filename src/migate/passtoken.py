@@ -40,26 +40,27 @@ def get_passtoken(auth_data=None):
     auth_data["_json"] = True
 
     try:
-        response      = get(SERVICELOGIN_URL, params=auth_data)
+        response = get(SERVICELOGIN_URL, params=auth_data)
         response_text = json.loads(response.text[11:])
     except Exception as e:
         console.print(f"\n[red]Connection error: {e}[/]\n")
         raise SystemExit(1)
 
     auth_data["serviceParam"] = response_text["serviceParam"]
-    auth_data["qs"]           = response_text["qs"]
-    auth_data["callback"]     = response_text["callback"]
-    auth_data["_sign"]        = response_text["_sign"]
+    auth_data["qs"] = response_text["qs"]
+    auth_data["callback"] = response_text["callback"]
+    auth_data["_sign"] = response_text["_sign"]
 
-    while True:
-        console.print("\nHow would you like to log in?\n\n  [orange]1[/] - Terminal\n  [orange]2[/] - Browser\n  [orange]3[/] - QR code\n")
-        choice = input("Choose: ").strip()
-        if choice not in ("1", "2", "3"):
-            console.print("\n[red]Invalid choice.[/]\n")
-            continue
-        break
+    console.print("\n[bold]How would you like to log in?[/]")
+    console.print("\n  [orange]1[/] - Browser [dim](default)[/]")
+    console.print("  [orange]2[/] - Terminal")
+    console.print("  [orange]3[/] - QR code\n")
+        
+    choice = input("Choose: ").strip()
+    if choice not in ("1", "2", "3"):
+        choice = "1"
 
-    if choice == "1":
+    if choice == "2":
         response_text = handle_terminal(auth_data)
     else:
         response_text = handle_browser_qr(auth_data, choice)
