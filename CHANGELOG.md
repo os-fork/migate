@@ -47,3 +47,7 @@
 
 - minor fixes
 - login methods: Browser(default), Terminal, QR code
+
+### Version 1.1.2:
+
+- QR code now displayed in terminal instead of browser
