@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-
 from migate.login.terminal import handle_terminal
 from migate.login.browser_qr import handle_browser_qr
 from migate.config import SERVICELOGIN_URL, console
