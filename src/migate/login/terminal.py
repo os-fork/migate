@@ -7,7 +7,7 @@ from migate.login.verify import handle_verify
 from migate.config import SERVICELOGINAUTH2_URL, console
 from migate.requester import session, post
 
-def handle_terminal(auth_data: dict, device_id: str) -> dict:
+def handle_terminal(auth_data: dict) -> dict:
 
     while True:
         user      = console.input("[white]Account ID / Email / Phone (+): [/]").strip()
@@ -16,8 +16,6 @@ def handle_terminal(auth_data: dict, device_id: str) -> dict:
 
         auth_data["user"] = user
         auth_data["hash"] = pwd
-
-        session.cookies.set("deviceId", device_id)
 
         try:
             response      = post(SERVICELOGINAUTH2_URL, data=auth_data)
