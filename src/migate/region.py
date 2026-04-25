@@ -8,14 +8,14 @@ def get_region(auth_cookies):
 
     userId = auth_cookies['userId']
 
-    region_file = Path.home() / ".mi_region" / "region.json"
+    region_file = Path.home() / ".migatesession" / "region.json"
 
     if region_file.exists():
         try:
             with open(region_file, "r") as f:
                 data = json.load(f)
-        except (json.JSONDecodeError, KeyError):
-            region_file.unlink()
+        except (json.JSONDecodeError, OSError):
+            region_file.unlink(missing_ok=True)
             data = {}
 
         region = data.get(userId)
@@ -42,18 +42,17 @@ def get_region(auth_cookies):
 
     session.cookies.clear()
 
-    region_file.parent.mkdir(parents=True, exist_ok=True)
-
     existing = {}
     if region_file.exists():
         try:
             with open(region_file, "r") as f:
                 existing = json.load(f)
-        except (json.JSONDecodeError, KeyError):
+        except (json.JSONDecodeError, OSError):
             pass
 
     existing[userId] = region
 
+    region_file.parent.mkdir(parents=True, exist_ok=True)
     with open(region_file, "w") as f:
         json.dump(existing, f)
 
