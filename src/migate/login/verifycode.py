@@ -11,6 +11,9 @@ def verify_code_ticket(addressType, label):
         console.print(f"[white]Check your {label} for the code.[/]")
         ticket = console.input("[orange]Enter code (or type 'r' to resend): [/]").strip()
 
+        if not ticket:
+            continue
+
         if ticket == "r":
             return "RESEND"
 
