@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+
 from migate.login.terminal import handle_terminal
 from migate.login.browser_qr import handle_browser_qr
 from migate.config import SERVICELOGIN_URL, console
@@ -17,8 +18,8 @@ def get_passtoken(auth_data=None):
         try:
             with open(cookies_file, "r") as f:
                 passToken = json.load(f)
-        except (json.JSONDecodeError, KeyError):
-            cookies_file.unlink()
+        except (json.JSONDecodeError, OSError):
+            cookies_file.unlink(missing_ok=True)
             console.print("Session corrupted, please log in again.\n", style="red")
             passToken = None
 
@@ -29,7 +30,7 @@ def get_passtoken(auth_data=None):
             ).strip().lower()
 
             if choice == "2":
-                cookies_file.unlink()
+                cookies_file.unlink(missing_ok=True)
                 console.print("Logged out.", style="red")
             else:
                 return passToken
@@ -52,8 +53,8 @@ def get_passtoken(auth_data=None):
     console.print("\n  [orange]1[/] - Browser [dim](default)[/]")
     console.print("  [orange]2[/] - Terminal")
     console.print("  [orange]3[/] - QR code\n")
-        
-    choice = input("Choose: ").strip()
+
+    choice = console.input("[white]Choose > [/white]").strip()
     if choice not in ("1", "2", "3"):
         choice = "1"
 
