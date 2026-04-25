@@ -1,6 +1,4 @@
-import hashlib
 import json
-import uuid
 from pathlib import Path
 
 from migate.login.terminal import handle_terminal
@@ -14,7 +12,7 @@ def get_passtoken(auth_data=None):
         auth_data = {"sid": "passport"}
 
     sid = auth_data["sid"]
-    cookies_file = Path.home() / f".{sid}" / "cookies.json"
+    cookies_file = Path.home() / ".migatesession" / f"{sid}" / "session.json"
 
     if cookies_file.exists():
         try:
