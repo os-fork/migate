@@ -6,14 +6,14 @@ from migate.requester import session, get
 
 def get_regionConfig(region):
 
-    region_file = Path.home() / ".mi_region" / "region.json"
+    region_file = Path.home() / ".migatesession" / "regionConfig.json"
 
     if region_file.exists():
         try:
             with open(region_file, "r") as f:
                 data = json.load(f)
-        except (json.JSONDecodeError, KeyError):
-            region_file.unlink()
+        except (json.JSONDecodeError, OSError):
+            region_file.unlink(missing_ok=True)
             data = {}
 
         regionConfig = data.get(region)
@@ -23,7 +23,7 @@ def get_regionConfig(region):
             return regionConfig
 
     try:
-        params = {'key': 'regionConfig'}
+        params        = {'key': 'regionConfig'}
         response      = get(REGIONCONFIG_URL, params=params)
         response_text = json.loads(response.text[11:])
     except Exception as e:
@@ -44,24 +44,20 @@ def get_regionConfig(region):
 
     session.cookies.clear()
 
-    region_file.parent.mkdir(parents=True, exist_ok=True)
-
     existing = {}
     if region_file.exists():
         try:
             with open(region_file, "r") as f:
                 existing = json.load(f)
-        except (json.JSONDecodeError, KeyError):
+        except (json.JSONDecodeError, OSError):
             pass
 
     existing[region] = regionConfig
 
+    region_file.parent.mkdir(parents=True, exist_ok=True)
     with open(region_file, "w") as f:
         json.dump(existing, f)
 
     console.print(f"\nregionConfig: {regionConfig}", style="green")
 
     return regionConfig
-
-
-
