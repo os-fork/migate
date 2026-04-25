@@ -2,25 +2,12 @@ import getpass
 import hashlib
 import json
 from urllib.parse import urlparse, parse_qs
-import uuid
-from pathlib import Path
-
 from migate.login.captcha import handle_captcha
 from migate.login.verify import handle_verify
 from migate.config import SERVICELOGINAUTH2_URL, console
 from migate.requester import session, post
 
-
-def _get_device_id(user: str) -> str:
-    id_file = Path.home() / f".migate_device_{hashlib.md5(user.encode()).hexdigest()[:8]}.json"
-    if id_file.exists():
-        return json.loads(id_file.read_text())["deviceId"]
-    deviceId = "wb_" + uuid.uuid4().hex
-    id_file.write_text(json.dumps({"deviceId": deviceId}))
-    return deviceId
-
-
-def handle_terminal(auth_data: dict) -> dict:
+def handle_terminal(auth_data: dict, device_id: str) -> dict:
 
     while True:
         user      = console.input("[white]Account ID / Email / Phone (+): [/]").strip()
@@ -30,7 +17,7 @@ def handle_terminal(auth_data: dict) -> dict:
         auth_data["user"] = user
         auth_data["hash"] = pwd
 
-        session.cookies.set("deviceId", _get_device_id(user))
+        session.cookies.set("deviceId", device_id)
 
         try:
             response      = post(SERVICELOGINAUTH2_URL, data=auth_data)
