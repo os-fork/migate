@@ -33,7 +33,7 @@ def _request(method, url, retries=RETRIES, **kwargs):
             response = session.request(method, url, **kwargs)
             response.raise_for_status()
             return response
-        except requests.exceptions.Timeout:
+        except requests.exceptions.Timeout as e:
             if retries == 1:
                 return None
             last_error = e
