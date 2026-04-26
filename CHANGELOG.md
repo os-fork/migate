@@ -51,3 +51,7 @@
 ### Version 1.1.2:
 
 - QR code now displayed in terminal instead of browser
+
+### Version 1.1.3:
+
+- Bug fixes and improvements
