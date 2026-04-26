@@ -10,7 +10,7 @@ def handle_verify(context, auth_data):
     console.print("\n=== 2FA Verification Required ===\n", style="orange")
 
     try:
-        response    = get(LIST_URL, params={"sid": auth_data["sid"], "supportedMask": "0", "context": context})
+        response = get(LIST_URL, params={"sid": auth_data["sid"], "supportedMask": "0", "context": context})
         result_json = json.loads(response.text[11:])
     except Exception as e:
         return {"error": f"Connection error: {str(e)}"}
@@ -18,13 +18,16 @@ def handle_verify(context, auth_data):
     options = result_json.get("options", [])
 
     if 8 in options and 4 in options:
-        console.print("Choose verification method:", style="white")
-        console.print("[orange]1[/][white] = Phone (SMS)[/]")
-        console.print("[orange]2[/][white] = Email[/]")
-        choice = console.input("[white]Enter 1 or 2: [/]").strip()
+        while True:
+            console.print("Choose verification method:", style="white")
+            console.print("[orange]1[/][white] = Phone (SMS)[/]")
+            console.print("[orange]2[/][white] = Email[/]")
+            choice = console.input("[white]Enter 1 or 2: [/]").strip()
 
-        if choice not in ["1", "2"]:
-            return {"error": "Invalid choice!"}
+            if choice in ["1", "2"]:
+                break
+            console.print("Invalid choice, try again.\n", style="red")
+
         addressType = "PH" if choice == "1" else "EM"
     elif 4 in options:
         addressType = "PH"
@@ -42,7 +45,7 @@ def handle_verify(context, auth_data):
         except Exception as e:
             return {"error": f"Connection error during quota check: {str(e)}"}
 
-        info      = quota_json.get("info")
+        info = quota_json.get("info")
         remaining = int(info) if info is not None else 0
         console.print(f"\n[white]Attempts remaining: [/][{'green' if remaining > 0 else 'red'}]{remaining}[/]")
 
