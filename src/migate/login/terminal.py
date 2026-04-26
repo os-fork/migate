@@ -5,7 +5,7 @@ from urllib.parse import urlparse, parse_qs
 from migate.login.captcha import handle_captcha
 from migate.login.verify import handle_verify
 from migate.config import SERVICELOGINAUTH2_URL, console
-from migate.requester import session, post
+from migate.requester import post
 
 def handle_terminal(auth_data: dict) -> dict:
 
