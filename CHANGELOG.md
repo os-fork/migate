@@ -55,3 +55,7 @@
 ### Version 1.1.3:
 
 - Bug fixes and improvements
+
+### Version 1.1.4:
+
+- get_region: fallback to uRegion if region could not be retrieved
