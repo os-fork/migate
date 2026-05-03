@@ -13,7 +13,7 @@ def handle_verify(context, auth_data):
         response = get(LIST_URL, params={"sid": auth_data["sid"], "supportedMask": "0", "context": context})
         result_json = json.loads(response.text[11:])
     except Exception as e:
-        return {"error": f"Connection error: {str(e)}"}
+        return {"error": str(e)}
 
     options = result_json.get("options", [])
 
@@ -43,7 +43,7 @@ def handle_verify(context, auth_data):
             response_quota = post(USERQUOTA_URL, data={"addressType": addressType, "contentType": "160040", "_json": "true"})
             quota_json     = json.loads(response_quota.text[11:])
         except Exception as e:
-            return {"error": f"Connection error during quota check: {str(e)}"}
+            return {"error": str(e)}
 
         info = quota_json.get("info")
         remaining = int(info) if info is not None else 0
@@ -80,7 +80,9 @@ def handle_verify(context, auth_data):
     try:
         response = get(verify_result, allow_redirects=False)
         location = response.headers.get("Location")
+        if not location:
+            return {"error": "Missing redirect location"}
         get(location, allow_redirects=False)
         return post(SERVICELOGINAUTH2_URL, data=auth_data)
     except Exception as e:
-        return {"error": f"Connection error: {str(e)}"}
+        return {"error": str(e)}

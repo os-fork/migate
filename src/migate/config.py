@@ -2,17 +2,18 @@ from rich.console import Console
 from rich.theme import Theme
 
 BASE_URL = "https://account.xiaomi.com"
-SERVICELOGIN_URL = BASE_URL + "/pass/serviceLogin"
-SERVICELOGINAUTH2_URL = SERVICELOGIN_URL + "Auth2"
-LIST_URL = BASE_URL + "/identity/list"
-SEND_EM_TICKET = BASE_URL + "/identity/auth/sendEmailTicket"
-SEND_PH_TICKET = BASE_URL + "/identity/auth/sendPhoneTicket"
-VERIFY_EM = BASE_URL + "/identity/auth/verifyEmail"
-VERIFY_PH = BASE_URL + "/identity/auth/verifyPhone"
-USERQUOTA_URL = BASE_URL + "/identity/pass/sms/userQuota"
-REGION_URL = BASE_URL + "/pass/user/login/region"
-REGIONCONFIG_URL = BASE_URL + "/pass2/config"
-LONGPOLLING_URL = BASE_URL + "/longPolling/loginUrl"
+SERVICELOGIN_URL = "https://account.xiaomi.com/pass/serviceLogin"
+SERVICELOGINAUTH2_URL = "https://account.xiaomi.com/pass/serviceLoginAuth2"
+LIST_URL = "https://account.xiaomi.com/identity/list"
+SEND_EM_TICKET = "https://account.xiaomi.com/identity/auth/sendEmailTicket"
+SEND_PH_TICKET = "https://account.xiaomi.com/identity/auth/sendPhoneTicket"
+VERIFY_EM = "https://account.xiaomi.com/identity/auth/verifyEmail"
+VERIFY_PH = "https://account.xiaomi.com/identity/auth/verifyPhone"
+USERQUOTA_URL = "https://account.xiaomi.com/identity/pass/sms/userQuota"
+REGION_URL = "https://account.xiaomi.com/pass/user/login/region"
+CONFIG_URL = "https://account.xiaomi.com/pass2/config"
+LONGPOLLING_URL = "https://account.xiaomi.com/longPolling/loginUrl"
+CONFIGURATION_URL = "https://api.account.xiaomi.com/pass/configuration"
 
 c_theme = Theme({
     "orange": "bold #ff6900",
@@ -20,6 +21,6 @@ c_theme = Theme({
     "red":    "bold #d50000",
     "white":  "bold white",
 })
-console = Console(theme=c_theme)
 
+console = Console(theme=c_theme)
 loader = console.status("", spinner="dots")

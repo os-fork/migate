@@ -15,8 +15,8 @@ def handle_browser_qr(auth_data: dict, choice: str) -> dict:
             response = get(LONGPOLLING_URL, params=auth_data)
             response_text = json.loads(response.text[11:])
         except Exception as e:
-            console.print(f"\n[red]Connection error: {e}[/]\n")
-            raise SystemExit(1)
+            console.print(f"\n[red]{e}[/]\n")
+            return None
 
         timeout = response_text["timeout"]
         url = response_text["loginUrl"]
@@ -35,13 +35,17 @@ def handle_browser_qr(auth_data: dict, choice: str) -> dict:
             qr.print_ascii()
 
         try:
-            response = get(lp, timeout=timeout, retries=1)
-            if response is None:
-                console.print("\n[red]The time limit has expired. Please try again.[/]\n")
-                continue
-        except Exception as e:
-            console.print(f"\n[red]Connection error: {e}[/]\n")
-            raise SystemExit(1)
+            response = get(lp, timeout=timeout)
+        except ConnectionError as e:
+            error = str(e)
+            if "timed out" in error:
+                console.print("\n[red]Request timed out. Please try again.[/]\n")
+            elif "Access denied" in error:
+                console.print("\n[red]Access denied. Please try again.[/]\n")
+            else:
+                console.print(f"\n[red]{e}[/]\n")
+                return None
+            continue
 
         break
 

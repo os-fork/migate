@@ -21,7 +21,7 @@ def verify_code_ticket(addressType, label):
             response      = post(url, data={"ticket": ticket, "trust": "true", "_json": "true"})
             response_text = json.loads(response.text[11:])
         except Exception as e:
-            return {"error": f"Connection error: {str(e)}"}
+            return {"error": str(e)}
 
         if response_text.get("code") == 0:
             return response_text.get("location")

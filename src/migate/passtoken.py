@@ -41,8 +41,8 @@ def get_passtoken(auth_data=None):
         response = get(SERVICELOGIN_URL, params=auth_data)
         response_text = json.loads(response.text[11:])
     except Exception as e:
-        console.print(f"\n[red]Connection error: {e}[/]\n")
-        raise SystemExit(1)
+        console.print(f"\n[red]{e}[/]\n")
+        return None
 
     auth_data["serviceParam"] = response_text["serviceParam"]
     auth_data["qs"] = response_text["qs"]
@@ -68,7 +68,7 @@ def get_passtoken(auth_data=None):
     missing  = required - cookies.keys()
     if missing:
         console.print(f"\n[red]Missing keys: {', '.join(missing)} | Response: {response_text}[/]\n")
-        raise SystemExit(1)
+        return None
 
     passToken = {k: cookies[k] for k in required}
 
@@ -76,7 +76,7 @@ def get_passtoken(auth_data=None):
     with open(cookies_file, "w") as f:
         json.dump(passToken, f)
 
-    console.print("\nLogin successful\n", style="green")
+    console.print("\nLogin successful", style="green")
     session.cookies.clear()
 
     return passToken

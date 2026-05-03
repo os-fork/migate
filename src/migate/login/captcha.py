@@ -21,9 +21,9 @@ _TEMPLATE = (Path(__file__).parent / "captcha.html").read_text()
 @dataclass
 class _CaptchaState:
     b64:   str
-    error: bool          = False
+    error: bool = False
     code:  Optional[str] = None
-    done:  bool          = False
+    done:  bool = False
 
 
 def _build_html(b64: str, error: bool = False) -> str:
@@ -34,8 +34,8 @@ def _build_html(b64: str, error: bool = False) -> str:
 def handle_captcha(send_url, response, payload, capt_key):
     try:
         response_text = json.loads(response.text[11:])
-        cap_url       = BASE_URL + response_text["captchaUrl"]
-        state         = _CaptchaState(b64=base64.b64encode(get(cap_url).content).decode())
+        cap_url = BASE_URL + response_text["captchaUrl"]
+        state = _CaptchaState(b64=base64.b64encode(get(cap_url).content).decode())
 
         class Handler(http.server.BaseHTTPRequestHandler):
             def log_message(self, *a): pass
@@ -50,9 +50,9 @@ def handle_captcha(send_url, response, payload, capt_key):
                     self.wfile.write(body)
 
                 elif self.path.startswith("/submit"):
-                    code        = parse_qs(urlparse(self.path).query).get("code", [""])[0]
-                    state.code  = unquote(code).strip()
-                    start       = time.time()
+                    code = parse_qs(urlparse(self.path).query).get("code", [""])[0]
+                    state.code = unquote(code).strip()
+                    start = time.time()
                     while state.code is not None and time.time() - start < 10:
                         time.sleep(0.1)
                     result = b"ok" if state.done else b"retry"
@@ -61,8 +61,8 @@ def handle_captcha(send_url, response, payload, capt_key):
                     self.end_headers()
                     self.wfile.write(result)
 
-        httpd  = socketserver.TCPServer(("127.0.0.1", 0), Handler)
-        port   = httpd.server_address[1]
+        httpd = socketserver.TCPServer(("127.0.0.1", 0), Handler)
+        port = httpd.server_address[1]
         thread = threading.Thread(target=httpd.serve_forever, daemon=True)
         thread.start()
 
@@ -79,11 +79,17 @@ def handle_captcha(send_url, response, payload, capt_key):
 
             payload[capt_key] = state.code
 
-            resp      = post(send_url, data=payload)
-            resp_text = json.loads(resp.text[11:])
+            try:
+                resp = post(send_url, data=payload)
+                resp_text = json.loads(resp.text[11:])
+            except Exception as e:
+                return {"error": str(e)}
 
             if resp_text.get("code") == 87001:
-                state.b64   = base64.b64encode(get(cap_url).content).decode()
+                try:
+                    state.b64 = base64.b64encode(get(cap_url).content).decode()
+                except Exception as e:
+                    return {"error": str(e)}
                 state.error = True
                 state.code  = None
             else:
@@ -95,4 +101,4 @@ def handle_captcha(send_url, response, payload, capt_key):
         return resp
 
     except Exception as e:
-        return {"error": f"Captcha handling failed: {str(e)}"}
+        return {"error": str(e)}

@@ -59,3 +59,8 @@
 ### Version 1.1.4:
 
 - get_region: fallback to uRegion if region could not be retrieved
+
+### Version 1.1.5:
+
+- Add utilities module: get_region, get_uRegion, get_uLocale, get_areaConfig, get_dataCenterZone
+- improvements

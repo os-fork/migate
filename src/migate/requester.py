@@ -1,10 +1,5 @@
-import time
 import requests
 from migate.config import loader
-
-TIMEOUT = 15
-RETRIES = 3
-BACKOFF = 2
 
 session = requests.Session()
 session.headers.update({
@@ -23,25 +18,22 @@ def post(url, **kwargs):
     return _request("POST", url, **kwargs)
 
 
-def _request(method, url, retries=RETRIES, **kwargs):
-    kwargs.setdefault("timeout", TIMEOUT)
-    last_error = None
-
-    for attempt in range(retries):
-        try:
-            loader.start()
-            response = session.request(method, url, **kwargs)
-            response.raise_for_status()
-            return response
-        except requests.exceptions.Timeout as e:
-            if retries == 1:
-                return None
-            last_error = e
-        except Exception as e:
-            last_error = e
-            if attempt < retries - 1:
-                time.sleep(BACKOFF ** (attempt + 1))
-        finally:
-            loader.stop()
-
-    raise ConnectionError(f"Failed after {retries} attempts: {last_error}")
+def _request(method, url, timeout=30, **kwargs):
+    try:
+        loader.start()
+        response = session.request(method, url, timeout=timeout, **kwargs)
+        response.raise_for_status()
+        return response
+    except requests.exceptions.Timeout:
+        raise ConnectionError("Request timed out")
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 403:
+            raise ConnectionError("Access denied")
+        raise ConnectionError(f"HTTP error: {e.response.status_code}")
+    except Exception as e:
+        error = str(e)
+        if "Failed to resolve" in error:
+            raise ConnectionError("No internet connection")
+        raise ConnectionError(f"Request failed: {e}")
+    finally:
+        loader.stop()

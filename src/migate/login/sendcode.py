@@ -11,10 +11,10 @@ def send_verification_code(addressType, label):
         send_url = SEND_PH_TICKET
 
     try:
-        response      = post(send_url)
+        response = post(send_url)
         response_text = json.loads(response.text[11:])
     except Exception as e:
-        return {"error": f"Connection error: {str(e)}"}
+        return {"error": str(e)}
 
     if response_text.get("code") == 87001:
         console.print("\nCAPTCHA verification required for sending code!\n", style="orange")
@@ -29,6 +29,6 @@ def send_verification_code(addressType, label):
         console.print(f"\nCode sent to {label} successfully.\n", style="green")
         return {"success": True}
 
-    code      = response_text.get("code")
+    code = response_text.get("code")
     error_msg = response_text.get("tips", response_text) if code == 70022 else response_text
     return {"error": error_msg}

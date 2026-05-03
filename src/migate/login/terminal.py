@@ -7,22 +7,36 @@ from migate.login.verify import handle_verify
 from migate.config import SERVICELOGINAUTH2_URL, console
 from migate.requester import post
 
+from migate.utilities.uRegion import get_uRegion
+from migate.utilities.areaConfig import get_areaConfig
+
 def handle_terminal(auth_data: dict) -> dict:
 
+    uRegion = get_uRegion()
+    if uRegion:
+        areaConfig = get_areaConfig(uRegion)
+        if areaConfig:
+            dial = f"(ex> {areaConfig['dial']}XXXXXXXXX)"
+        else:
+            dial = ""
+    else:
+        dial = ""
+
     while True:
-        user      = console.input("[white]Account ID / Email / Phone (+): [/]").strip()
-        pwd_input = getpass.getpass("Password: ").strip()
-        pwd       = hashlib.md5(pwd_input.encode()).hexdigest().upper()
+        console.print(f"\n[white]Enter your:\n  Xiaomi Account ID, Email, or Phone {dial}[/]")
+        user = console.input("[white]> [/]").strip()
+        pwd_input = getpass.getpass("\nPassword> ").strip()
+        pwd = hashlib.md5(pwd_input.encode()).hexdigest().upper()
 
         auth_data["user"] = user
         auth_data["hash"] = pwd
 
         try:
-            response      = post(SERVICELOGINAUTH2_URL, data=auth_data)
+            response = post(SERVICELOGINAUTH2_URL, data=auth_data)
             response_text = json.loads(response.text[11:])
         except Exception as e:
-            console.print(f"\n[red]Connection error: {e}[/]\n")
-            raise SystemExit(1)
+            console.print(f"\n[red]{e}[/]\n")
+            return None
 
         if response_text.get("code") == 70016:
             console.print("\nInvalid password or username! Please try again.\n", style="red")
@@ -34,7 +48,7 @@ def handle_terminal(auth_data: dict) -> dict:
 
             if isinstance(response, dict) and "error" in response:
                 console.print(f"\n[red]{response['error']}[/]\n")
-                raise SystemExit(1)
+                return None
 
             response_text = json.loads(response.text[11:])
 
@@ -48,14 +62,14 @@ def handle_terminal(auth_data: dict) -> dict:
         notification_url = response_text["notificationUrl"]
         if any(x in notification_url for x in ["callback", "SetEmail", "BindAppealOrSafePhone"]):
             console.print(f"\n[red]Action required at: {notification_url}[/]\n")
-            raise SystemExit(1)
+            return None
 
         context  = parse_qs(urlparse(notification_url).query)["context"][0]
         response = handle_verify(context, auth_data)
 
         if isinstance(response, dict) and "error" in response:
             console.print(f"\n[red]{response['error']}[/]\n")
-            raise SystemExit(1)
+            return None
 
         response_text = json.loads(response.text[11:])
 

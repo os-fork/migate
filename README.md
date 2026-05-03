@@ -60,7 +60,10 @@ import migate
 # --- 18n_bbs_global: Mi Community ---
 # params = {"sid": "18n_bbs_global"}
 
+params = {"sid": "unlockApi", "checkSafeAddress": True}
+
 pass_token = migate.get_passtoken(params)
+
 service = migate.get_service(pass_token, params)
 
 print(pass_token)
@@ -90,31 +93,33 @@ print(service)
 # }
 ```
 
+> All functions return `None` on failure. Always check the return value before passing it to the next call.
+
 ---
 
-## Region detection
+## Utilities
 
 ```python
-import migate
+# get account region 
+region = migate.get_region(pass_token)
 
-pass_token = migate.get_passtoken()
-region = migate.get_region(pass_token)          # e.g. "EU"
-region_config = migate.get_regionConfig(region) # e.g. "Europe"
+# get dataCenterZone
+## get with account region
+zone = migate.get_dataCenterZone(region)                 ## get with account ID 
+zone = migate.get_dataCenterZone(userId)                 ## manual selection
+zone = migate.get_dataCenterZone()                              
+
+# get uRegion
+uRegion = migate.get_uRegion()
+
+# get uLocale
+uLocale = migate.get_uLocale() 
+
+# areaConfig, ex: with SG
+area = migate.get_areaConfig("SG")
+# {"code": "SG", "name": "Singapore", "dial": "+65"}
 ```
 
----
-
-## Login
-
-On first run, `get_passtoken` prompts:
-
-```
-1 - Browser (default)
-2 - Terminal
-3 - QR code
-```
-
-The session is saved at `~/.{sid}/cookies.json` and reused automatically on the next run
 
 ---
 
