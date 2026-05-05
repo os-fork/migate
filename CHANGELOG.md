@@ -64,3 +64,7 @@
 
 - Add utilities module: get_region, get_uRegion, get_uLocale, get_areaConfig, get_dataCenterZone
 - improvements
+
+### Version 1.1.6:
+
+- get_passtoken: add silent parameter to skip the "already logged in" prompt

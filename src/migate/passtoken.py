@@ -7,7 +7,7 @@ from migate.config import SERVICELOGIN_URL, console
 from migate.requester import session, get
 
 
-def get_passtoken(auth_data=None):
+def get_passtoken(auth_data=None, silent=False):
     if auth_data is None:
         auth_data = {"sid": "passport"}
 
@@ -24,6 +24,10 @@ def get_passtoken(auth_data=None):
             passToken = None
 
         if passToken is not None:
+
+            if silent:
+                return passToken
+
             choice = console.input(
                 f"\n[green]Already logged in[/][white]\nAccount ID: [/][orange]{passToken['userId']}[/]\n\n"
                 f"[white](Enter to continue, [red]2[/red] To log out)[/white][white] > [/white]"

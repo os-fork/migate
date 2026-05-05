@@ -63,6 +63,8 @@ import migate
 params = {"sid": "unlockApi", "checkSafeAddress": True}
 
 pass_token = migate.get_passtoken(params)
+# skip the interactive prompt if already logged in
+# pass_token = migate.get_passtoken(params, silent=True)
 
 service = migate.get_service(pass_token, params)
 
