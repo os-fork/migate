@@ -1,14 +1,62 @@
-import getpass
-import hashlib
-import json
-from urllib.parse import urlparse, parse_qs
 from migate.login.captcha import handle_captcha
 from migate.login.verify import handle_verify
 from migate.config import SERVICELOGINAUTH2_URL, console
 from migate.requester import post
-
 from migate.utilities.uRegion import get_uRegion
 from migate.utilities.areaConfig import get_areaConfig
+from urllib.parse import urlparse, parse_qs
+import hashlib
+import json
+import sys
+
+def password_input():
+    pwd = []
+    if sys.platform == "win32":
+        import msvcrt
+        while True:
+            ch = msvcrt.getwch()
+            if ch in ("\r", "\n"):
+                break
+            elif ch == "\b":
+                if pwd:
+                    pwd.pop()
+                    sys.stdout.write("\b \b")
+                    sys.stdout.flush()
+            else:
+                pwd.append(ch)
+                sys.stdout.write("*")
+                sys.stdout.flush()
+    else:
+        import tty, termios
+        fd = sys.stdin.fileno()
+        old = termios.tcgetattr(fd)
+        try:
+            tty.setraw(fd)
+            while True:
+                ch = sys.stdin.read(1)
+                if ch in ("\r", "\n"):
+                    break
+                elif ch == "\x7f":
+                    if pwd:
+                        pwd.pop()
+                        sys.stdout.write("\b \b")
+                        sys.stdout.flush()
+                else:
+                    pwd.append(ch)
+                    sys.stdout.write("*")
+                    sys.stdout.flush()
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old)
+    sys.stdout.write("\n")
+    return "".join(pwd)
+
+def get_credentials(dial=""):
+    console.print(f"\n[white]Xiaomi Account ID, Email, or Phone {dial}[/]")
+    user = console.input("[white]> [/]").strip()
+    console.print("[white]Password> [/]", end="")
+    pwd_input = password_input().strip()
+    pwd = hashlib.md5(pwd_input.encode()).hexdigest().upper()
+    return user, pwd
 
 def handle_terminal(auth_data: dict) -> dict:
 
@@ -23,11 +71,7 @@ def handle_terminal(auth_data: dict) -> dict:
         dial = ""
 
     while True:
-        console.print(f"\n[white]Enter your:\n  Xiaomi Account ID, Email, or Phone {dial}[/]")
-        user = console.input("[white]> [/]").strip()
-        pwd_input = getpass.getpass("\nPassword> ").strip()
-        pwd = hashlib.md5(pwd_input.encode()).hexdigest().upper()
-
+        user, pwd = get_credentials(dial)
         auth_data["user"] = user
         auth_data["hash"] = pwd
 
