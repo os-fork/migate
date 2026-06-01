@@ -68,3 +68,7 @@
 ### Version 1.1.6:
 
 - get_passtoken: add silent parameter to skip the "already logged in" prompt
+
+### Version 1.1.7:
+
+- mask password input with asterisks
