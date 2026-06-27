@@ -107,9 +107,11 @@ region = migate.get_region(pass_token)
 
 # get dataCenterZone
 ## get with account region
-zone = migate.get_dataCenterZone(region)                 ## get with account ID 
-zone = migate.get_dataCenterZone(userId)                 ## manual selection
-zone = migate.get_dataCenterZone()                              
+zone = migate.get_dataCenterZone(region)
+## get with account ID
+zone = migate.get_dataCenterZone(userId)
+## manual selection
+zone = migate.get_dataCenterZone()
 
 # get uRegion
 uRegion = migate.get_uRegion()
