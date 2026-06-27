@@ -15,8 +15,7 @@ from urllib.parse import unquote, urlparse, parse_qs
 from migate.config import BASE_URL, console
 from migate.requester import get, post
 
-_TEMPLATE = (Path(__file__).parent / "captcha.html").read_text()
-
+_TEMPLATE = (Path(__file__).parent / "captcha.html").read_text(encoding="utf-8")
 
 @dataclass
 class _CaptchaState:
