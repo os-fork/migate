@@ -72,3 +72,7 @@
 ### Version 1.1.7:
 
 - mask password input with asterisks
+
+### Version 1.1.8:
+
+- minor fixes
