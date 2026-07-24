@@ -14,6 +14,7 @@ REGION_URL = "https://account.xiaomi.com/pass/user/login/region"
 CONFIG_URL = "https://account.xiaomi.com/pass2/config"
 LONGPOLLING_URL = "https://account.xiaomi.com/longPolling/loginUrl"
 CONFIGURATION_URL = "https://api.account.xiaomi.com/pass/configuration"
+PROFILE_HOME_URL = "https://account.xiaomi.com/pass2/profile/home"
 
 c_theme = Theme({
     "orange": "bold #ff6900",
