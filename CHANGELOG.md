@@ -76,3 +76,7 @@
 ### Version 1.1.8:
 
 - minor fixes
+
+### Version 1.1.9:
+
+- config updates
