@@ -3,7 +3,7 @@ import base64
 import hashlib
 from urllib.parse import quote
 
-from migate.config import SERVICELOGIN_URL, console
+from migate.config import SERVICELOGIN_URL, console, RED
 from migate.requester import session, get
 
 
@@ -22,7 +22,7 @@ def get_service(auth_cookies, params=None):
         response = get(SERVICELOGIN_URL, params=params)
         response_text = json.loads(response.text[11:])
     except Exception as e:
-        console.print(f"\n[red]{e}[/]\n")
+        console.print(f"\n[{RED}]{e}[/]\n")
         session.cookies.clear()
         return None
 
@@ -33,7 +33,7 @@ def get_service(auth_cookies, params=None):
     psecurity = response_text.get("psecurity")
 
     if not nonce or not ssecurity:
-        console.print(f"\n[red]Missing service data | Response: {response_text}[/]\n")
+        console.print(f"\n[{RED}]Missing service data | Response: {response_text}[/]\n")
         return None
 
     client_sign = quote(base64.b64encode(
@@ -44,7 +44,7 @@ def get_service(auth_cookies, params=None):
         response = get(f"{location}&clientSign={client_sign}")
         service_cookies = response.cookies.get_dict()
     except Exception as e:
-        console.print(f"\n[red]{e}[/]\n")
+        console.print(f"\n[{RED}]{e}[/]\n")
         return None
     finally:
         session.cookies.clear()

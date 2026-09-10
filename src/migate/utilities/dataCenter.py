@@ -1,29 +1,29 @@
 import json
-from migate.config import CONFIG_URL, CONFIGURATION_URL, console
+from migate.config import CONFIG_URL, CONFIGURATION_URL, console, WHITE, ORANGE, RED, GREEN
 from migate.requester import session, get
 
 def select_manually():
     _ZONES = ["Singapore", "China", "Russia", "India", "Europe"]
-    console.print("\n[white]Select dataCenterZone:[/white]")
-    console.print("[white]" + "─" * 40 + "[/white]")
+    console.print(f"\n[{WHITE}]Select dataCenterZone:[/]")
+    console.print(f"[{WHITE}]" + "─" * 40 + "[/]")
     for i, zone in enumerate(_ZONES, 1):
-        console.print(f"  [orange]{i}.[/orange] [white]{zone}[/white]")
-    console.print("[white]" + "─" * 40 + "[/white]\n")
+        console.print(f"  [{ORANGE}]{i}.[/] [{WHITE}]{zone}[/]")
+    console.print(f"[{WHITE}]" + "─" * 40 + "[/]\n")
 
     while True:
-        choice = console.input(f"[white]Select (1-{len(_ZONES)}): [/white]").strip()
+        choice = console.input(f"[{WHITE}]Select (1-{len(_ZONES)}): [/]").strip()
 
         if not choice.isdigit():
-            console.print("[red]Invalid input. Enter a number.[/red]\n")
+            console.print(f"[{RED}]Invalid input. Enter a number.[/]\n")
             continue
 
         idx = int(choice) - 1
         if 0 <= idx < len(_ZONES):
             Zone = _ZONES[idx]
-            console.print(f"\n[green]dataCenterZone selected: {Zone}[/green]\n")
+            console.print(f"\n[{GREEN}]dataCenterZone selected: {Zone}[/]\n")
             return Zone
 
-        console.print(f"[red]Out of range. Enter 1–{len(_ZONES)}.[/red]\n")
+        console.print(f"[{RED}]Out of range. Enter 1–{len(_ZONES)}.[/]\n")
 
 
 def get_with_userId(userId):
@@ -32,7 +32,7 @@ def get_with_userId(userId):
         response = get(CONFIGURATION_URL, params={'keys': 'idc'})
         response_text = json.loads(response.text)
     except Exception as e:
-        console.print(f"\n[red]{e}[/]\n")
+        console.print(f"\n[{RED}]{e}[/]\n")
         return None
 
     idc = response_text["data"]["idc"]
@@ -45,7 +45,7 @@ def get_with_userId(userId):
             if r["min"] <= userId <= r["max"]:
                 return name
 
-    console.print(f"\n[red]Failed to get dataCenterZone with userId[/]\n")
+    console.print(f"\n[{RED}]Failed to get dataCenterZone with userId[/]\n")
     return None
 
 
@@ -55,7 +55,7 @@ def get_with_region(region):
         response = get(CONFIG_URL, params={'key': 'regionConfig'})
         response_text = json.loads(response.text[11:])
     except Exception as e:
-        console.print(f"\n[red]{e}[/]\n")
+        console.print(f"\n[{RED}]{e}[/]\n")
         return None
 
     Zone = next(
@@ -65,7 +65,7 @@ def get_with_region(region):
     )
 
     if Zone is None:
-        console.print(f"\n[red]Failed to get dataCenterZone from region account[/]\n")
+        console.print(f"\n[{RED}]Failed to get dataCenterZone from region account[/]\n")
 
     return Zone
 

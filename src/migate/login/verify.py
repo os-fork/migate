@@ -2,12 +2,12 @@ import json
 import time
 from migate.login.sendcode import send_verification_code
 from migate.login.verifycode import verify_code_ticket
-from migate.config import LIST_URL, SERVICELOGINAUTH2_URL, USERQUOTA_URL, console
+from migate.config import LIST_URL, SERVICELOGINAUTH2_URL, USERQUOTA_URL, console, ORANGE, WHITE, RED, GREEN
 from migate.requester import get, post
 
 
 def handle_verify(context, auth_data):
-    console.print("\n=== 2FA Verification Required ===\n", style="orange")
+    console.print("\n=== 2FA Verification Required ===\n", style=ORANGE)
 
     try:
         response = get(LIST_URL, params={"sid": auth_data["sid"], "supportedMask": "0", "context": context})
@@ -19,14 +19,14 @@ def handle_verify(context, auth_data):
 
     if 8 in options and 4 in options:
         while True:
-            console.print("Choose verification method:", style="white")
-            console.print("[orange]1[/][white] = Phone (SMS)[/]")
-            console.print("[orange]2[/][white] = Email[/]")
-            choice = console.input("[white]Enter 1 or 2: [/]").strip()
+            console.print("Choose verification method:", style=WHITE)
+            console.print(f"[{ORANGE}]1[/][{WHITE}] = Phone (SMS)[/]")
+            console.print(f"[{ORANGE}]2[/][{WHITE}] = Email[/]")
+            choice = console.input(f"[{WHITE}]Enter 1 or 2: [/]").strip()
 
             if choice in ["1", "2"]:
                 break
-            console.print("Invalid choice, try again.\n", style="red")
+            console.print("Invalid choice, try again.\n", style=RED)
 
         addressType = "PH" if choice == "1" else "EM"
     elif 4 in options:
@@ -47,7 +47,7 @@ def handle_verify(context, auth_data):
 
         info = quota_json.get("info")
         remaining = int(info) if info is not None else 0
-        console.print(f"\n[white]Attempts remaining: [/][{'green' if remaining > 0 else 'red'}]{remaining}[/]")
+        console.print(f"\n[{WHITE}]Attempts remaining: [/][{GREEN if remaining > 0 else RED}]{remaining}[/]")
 
         if remaining == 0:
             return {"error": f"Sent too many codes to {label}. Try again tomorrow."}
@@ -61,7 +61,7 @@ def handle_verify(context, auth_data):
                 for i in range(int(wt_seconds), 0, -1):
                     print(f"\rPlease wait: {i} before you can try resend again", end="", flush=True)
                     time.sleep(1)
-                console.input("\n[white]Press Enter to try resending now... [/]")
+                console.input(f"\n[{WHITE}]Press Enter to try resending now... [/]")
                 continue
 
             return send_result
@@ -69,7 +69,7 @@ def handle_verify(context, auth_data):
         verify_result = verify_code_ticket(addressType, label)
 
         if verify_result == "RESEND":
-            console.print("\n[orange]Retrying to send the code...[/]\n")
+            console.print(f"\n[{ORANGE}]Retrying to send the code...[/]\n")
             continue
 
         if isinstance(verify_result, dict) and "error" in verify_result:

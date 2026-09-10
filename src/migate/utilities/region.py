@@ -1,5 +1,5 @@
 import json
-from migate.config import REGION_URL, console
+from migate.config import REGION_URL, console, RED
 from migate.requester import session, get
 
 def get_region(auth_cookies):
@@ -11,7 +11,7 @@ def get_region(auth_cookies):
         response = get(REGION_URL)
         response_text = json.loads(response.text[11:])
     except Exception as e:
-        console.print(f"\n[red]{e}[/]\n")
+        console.print(f"\n[{RED}]{e}[/]\n")
         return None
     finally:
         session.cookies.clear()
@@ -19,10 +19,10 @@ def get_region(auth_cookies):
     region = response_text.get("data", {}).get("region")
 
     if not region and response_text.get('code') != 0:
-        console.print(f"\n[red]Failed to get account region | Response: {response_text}[/]\n")
+        console.print(f"\n[{RED}]Failed to get account region | Response: {response_text}[/]\n")
         return None
     elif not region:
-        console.print(f"\n[red]Failed to get account region[/]\n")
+        console.print(f"\n[{RED}]Failed to get account region[/]\n")
         return None
 
     return region

@@ -85,3 +85,7 @@
 
 - config updates
 - Add parse_res utility to parse JSON response
+
+### Version 1.1.11:
+
+- improvements (unified console color scheme)

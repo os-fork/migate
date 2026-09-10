@@ -3,7 +3,7 @@ import os
 import platform
 import webbrowser
 import qrcode
-from migate.config import LONGPOLLING_URL, console
+from migate.config import LONGPOLLING_URL, console, RED, WHITE
 from migate.requester import get
 
 def handle_browser_qr(auth_data: dict, choice: str) -> dict:
@@ -15,7 +15,7 @@ def handle_browser_qr(auth_data: dict, choice: str) -> dict:
             response = get(LONGPOLLING_URL, params=auth_data)
             response_text = json.loads(response.text[11:])
         except Exception as e:
-            console.print(f"\n[red]{e}[/]\n")
+            console.print(f"\n[{RED}]{e}[/]\n")
             return None
 
         timeout = response_text["timeout"]
@@ -29,7 +29,7 @@ def handle_browser_qr(auth_data: dict, choice: str) -> dict:
                 webbrowser.open(url)
         elif choice == "3":
             qrTips = response_text["qrTips"]
-            console.print(f"\n[white]{qrTips}[/]\n")
+            console.print(f"\n[{WHITE}]{qrTips}[/]\n")
             qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_L)
             qr.add_data(url)
             qr.print_ascii()
@@ -39,11 +39,11 @@ def handle_browser_qr(auth_data: dict, choice: str) -> dict:
         except ConnectionError as e:
             error = str(e)
             if "timed out" in error:
-                console.print("\n[red]Request timed out. Please try again.[/]\n")
+                console.print(f"\n[{RED}]Request timed out. Please try again.[/]\n")
             elif "Access denied" in error:
-                console.print("\n[red]Access denied. Please try again.[/]\n")
+                console.print(f"\n[{RED}]Access denied. Please try again.[/]\n")
             else:
-                console.print(f"\n[red]{e}[/]\n")
+                console.print(f"\n[{RED}]{e}[/]\n")
                 return None
             continue
 

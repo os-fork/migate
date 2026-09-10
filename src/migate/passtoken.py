@@ -3,7 +3,7 @@ from pathlib import Path
 
 from migate.login.terminal import handle_terminal
 from migate.login.browser_qr import handle_browser_qr
-from migate.config import SERVICELOGIN_URL, console
+from migate.config import SERVICELOGIN_URL, console, GREEN, WHITE, ORANGE, RED, DIM
 from migate.requester import session, get
 
 
@@ -20,7 +20,7 @@ def get_passtoken(auth_data=None, silent=False):
                 passToken = json.load(f)
         except (json.JSONDecodeError, OSError):
             cookies_file.unlink(missing_ok=True)
-            console.print("Session corrupted, please log in again.\n", style="red")
+            console.print("Session corrupted, please log in again.\n", style=RED)
             passToken = None
 
         if passToken is not None:
@@ -29,13 +29,13 @@ def get_passtoken(auth_data=None, silent=False):
                 return passToken
 
             choice = console.input(
-                f"\n[green]Already logged in[/][white]\nAccount ID: [/][orange]{passToken['userId']}[/]\n\n"
-                f"[white](Enter to continue, [red]2[/red] To log out)[/white][white] > [/white]"
+                f"\n[{GREEN}]Already logged in[/][{WHITE}]\nAccount ID: [/][{ORANGE}]{passToken['userId']}[/]\n\n"
+                f"[{WHITE}](Enter to continue, [{RED}]2[/] To log out) > [/]"
             ).strip().lower()
 
             if choice == "2":
                 cookies_file.unlink(missing_ok=True)
-                console.print("Logged out.", style="red")
+                console.print("Logged out.", style=RED)
             else:
                 return passToken
 
@@ -45,7 +45,7 @@ def get_passtoken(auth_data=None, silent=False):
         response = get(SERVICELOGIN_URL, params=auth_data)
         response_text = json.loads(response.text[11:])
     except Exception as e:
-        console.print(f"\n[red]{e}[/]\n")
+        console.print(f"\n[{RED}]{e}[/]\n")
         return None
 
     auth_data["serviceParam"] = response_text["serviceParam"]
@@ -54,11 +54,11 @@ def get_passtoken(auth_data=None, silent=False):
     auth_data["_sign"] = response_text["_sign"]
 
     console.print("\n[bold]How would you like to log in?[/]")
-    console.print("\n  [orange]1[/] - Browser [dim](default)[/]")
-    console.print("  [orange]2[/] - Terminal")
-    console.print("  [orange]3[/] - QR code\n")
+    console.print(f"\n  [{ORANGE}]1[/] - Browser [{DIM}](default)[/]")
+    console.print(f"  [{ORANGE}]2[/] - Terminal")
+    console.print(f"  [{ORANGE}]3[/] - QR code\n")
 
-    choice = console.input("[white]Choose > [/white]").strip()
+    choice = console.input(f"[{WHITE}]Choose > [/]").strip()
     if choice not in ("1", "2", "3"):
         choice = "1"
 
@@ -71,7 +71,7 @@ def get_passtoken(auth_data=None, silent=False):
     required = {"deviceId", "passToken", "userId"}
     missing  = required - cookies.keys()
     if missing:
-        console.print(f"\n[red]Missing keys: {', '.join(missing)} | Response: {response_text}[/]\n")
+        console.print(f"\n[{RED}]Missing keys: {', '.join(missing)} | Response: {response_text}[/]\n")
         return None
 
     passToken = {k: cookies[k] for k in required}
@@ -80,7 +80,7 @@ def get_passtoken(auth_data=None, silent=False):
     with open(cookies_file, "w") as f:
         json.dump(passToken, f)
 
-    console.print("\nLogin successful", style="green")
+    console.print("\nLogin successful", style=GREEN)
     session.cookies.clear()
 
     return passToken

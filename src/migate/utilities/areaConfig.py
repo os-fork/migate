@@ -1,5 +1,5 @@
 import json
-from migate.config import CONFIG_URL, console
+from migate.config import CONFIG_URL, console, RED
 from migate.requester import session, get
 
 def get_areaConfig(country_code: str) -> dict:
@@ -9,13 +9,13 @@ def get_areaConfig(country_code: str) -> dict:
         response = get(CONFIG_URL, params=params)
         response_text = json.loads(response.text[11:])
     except Exception as e:
-        console.print(f"\n[red]{e}[/]\n")
+        console.print(f"\n[{RED}]{e}[/]\n")
         return None
 
     areas = response_text.get("areaConfig")
 
     if not areas:
-        console.print(f"\n[red]Failed to get areaConfig | Response: {response_text}[/]\n")
+        console.print(f"\n[{RED}]Failed to get areaConfig | Response: {response_text}[/]\n")
         return None
 
     for letter, countries in areas.items():

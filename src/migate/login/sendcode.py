@@ -1,7 +1,7 @@
 import json
 
 from migate.login.captcha import handle_captcha
-from migate.config import SEND_EM_TICKET, SEND_PH_TICKET, console
+from migate.config import SEND_EM_TICKET, SEND_PH_TICKET, console, ORANGE, GREEN
 from migate.requester import post
 
 def send_verification_code(addressType, label):
@@ -17,7 +17,7 @@ def send_verification_code(addressType, label):
         return {"error": str(e)}
 
     if response_text.get("code") == 87001:
-        console.print("\nCAPTCHA verification required for sending code!\n", style="orange")
+        console.print("\nCAPTCHA verification required for sending code!\n", style=ORANGE)
         response = handle_captcha(send_url, response, {"icode": "", "_json": "true"}, "icode")
 
         if isinstance(response, dict) and "error" in response:
@@ -26,7 +26,7 @@ def send_verification_code(addressType, label):
         response_text = json.loads(response.text[11:])
 
     if response_text.get("code") == 0:
-        console.print(f"\nCode sent to {label} successfully.\n", style="green")
+        console.print(f"\nCode sent to {label} successfully.\n", style=GREEN)
         return {"success": True}
 
     code = response_text.get("code")

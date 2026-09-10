@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Optional
 from urllib.parse import unquote, urlparse, parse_qs
 
-from migate.config import BASE_URL, console
+from migate.config import BASE_URL, console, WHITE, ORANGE
 from migate.requester import get, post
 
 _TEMPLATE = (Path(__file__).parent / "captcha.html").read_text(encoding="utf-8")
@@ -70,7 +70,7 @@ def handle_captcha(send_url, response, payload, capt_key):
             os.system(f"xdg-open '{url}' 2>/dev/null")
         else:
             webbrowser.open(url)
-        console.print(f"[white]Captcha opened at: [/][orange]{url}[/]")
+        console.print(f"[{WHITE}]Captcha opened at: [/][{ORANGE}]{url}[/]")
 
         while True:
             while state.code is None:
