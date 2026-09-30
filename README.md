@@ -10,6 +10,7 @@
 
 [![Version](https://img.shields.io/pypi/v/migate?label=Version&labelColor=black&color=brightgreen)](https://pypi.org/project/migate/)
 [![Changelog](https://img.shields.io/badge/Changelog-blue?style=flat&logoColor=white)](CHANGELOG.md)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 
 ---
 
@@ -123,20 +124,3 @@ uLocale = migate.get_uLocale()
 area = migate.get_areaConfig("SG")
 # {"code": "SG", "name": "Singapore", "dial": "+65"}
 ```
-
-
----
-
-<div align="center">
-
-🤝 [Contributing](CONTRIBUTING.md)
-
-<a href="https://github.com/offici5l/migate/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=offici5l/migate" />
-</a>
-
----
-
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
-
-</div>
